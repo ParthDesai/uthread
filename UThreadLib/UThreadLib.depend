@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1405056767 source:/home/parth/Documents/UThreadLib/UThread.c
+	"UThread.h"
+
+1405056833 /home/parth/Documents/UThreadLib/UThread.h
+	<stdio.h>
+	<stdlib.h>
+	<unistd.h>
+	<ucontext.h>
+	<sys/types.h>
+	<sys/syscall.h>
+	<sys/time.h>
+	<signal.h>
+	<time.h>
+
