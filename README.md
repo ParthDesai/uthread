@@ -22,5 +22,5 @@ $ clib install parthdesai/uthread
 
 # Contributors:
 
-Parth Desai [@parthdesai](http://github.com/parthdesai)
-Vinit Kumar [@vinitkumar](http://github.com/vinitkumar)
+- Parth Desai [@parthdesai](http://github.com/parthdesai)
+- Vinit Kumar [@vinitkumar](http://github.com/vinitkumar)
