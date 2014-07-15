@@ -1,0 +1,12 @@
+{
+  "name": "uthread",
+  "version": "0.0.1",
+  "repo": "parthdesai/uThread/",
+  "description": "A pre-emptive and priority driven threading library for linux",
+  "keywords": ["thread", "find", "path", "bin", "executable"],
+  "license": "MIT",
+  "src": ["src/uthread.c", "src/uthread.h"],
+  "dependencies": {
+    "strdup": "0.0.0"
+  }
+}
