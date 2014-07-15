@@ -13,66 +13,60 @@
 #define CLOCK_ID CLOCK_THREAD_CPUTIME_ID
 
 
-enum queue
-{
-    QUEUE_LOW_PRIORITY = 0,
-    QUEUE_MEDIUM_PRIORITY = 1,
-    QUEUE_HIGH_PRIORITY = 2,
-    QUEUE_UNDEFINED = 3
+enum queue {
+  QUEUE_LOW_PRIORITY = 0,
+  QUEUE_MEDIUM_PRIORITY = 1,
+  QUEUE_HIGH_PRIORITY = 2,
+  QUEUE_UNDEFINED = 3
 };
 
 
-enum status
-{
-    STATUS_READY = 1,
-    STATUS_RUNNING = 2,
-    STATUS_BLOCKED = 4
+enum status {
+  STATUS_READY = 1,
+  STATUS_RUNNING = 2,
+  STATUS_BLOCKED = 4
 };
 
-enum priority
-{
-    PRIORITY_LOW = 8,
-    PRIORITY_MEDIUM = 16,
-    PRIORITY_HIGH = 32
+enum priority {
+  PRIORITY_LOW = 8,
+  PRIORITY_MEDIUM = 16,
+  PRIORITY_HIGH = 32
 };
 
-struct ThreadBlock
-{
-    int id;
-    int status;
-    int numberOfChildren;
+struct ThreadBlock {
+  int id;
+  int status;
+  int numberOfChildren;
 
-    ucontext_t * context;
-    struct ThreadBlock * parent;
+  ucontext_t * context;
+  struct ThreadBlock * parent;
 
-    struct ThreadBlock * next;
-    struct ThreadBlock * previous;
+  struct ThreadBlock * next;
+  struct ThreadBlock * previous;
 };
 
-struct UThreadOptions
-{
-    long stackSize;
-    long timeSlice;
+struct UThreadOptions {
+  long stackSize;
+  long timeSlice;
 };
 
 typedef struct UThreadOptions UThreadOptions;
 
 typedef struct ThreadBlock ThreadBlock;
 
-struct UThreadContext
-{
-    UThreadOptions uThreadOptions;
+struct UThreadContext {
+  UThreadOptions uThreadOptions;
 
-    ThreadBlock * waitingQueueHead;
+  ThreadBlock * waitingQueueHead;
 
-    ThreadBlock ** queueHeads;
+  ThreadBlock ** queueHeads;
 
-    int currentRunningQueue;
+  int currentRunningQueue;
 
-    ucontext_t * mainContext;
-    int currentID;
-    int isInitialized;
-    timer_t timerId;
+  ucontext_t * mainContext;
+  int currentID;
+  int isInitialized;
+  timer_t timerId;
 };
 
 typedef struct UThreadContext UThreadContext;
