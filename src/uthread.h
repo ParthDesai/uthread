@@ -9,9 +9,7 @@
 #include <time.h>
 
 #define TIMER_SIGNAL_NO SIGVTALRM
-
 #define CLOCK_ID CLOCK_THREAD_CPUTIME_ID
-
 
 enum queue {
   QUEUE_LOW_PRIORITY = 0,
@@ -19,7 +17,6 @@ enum queue {
   QUEUE_HIGH_PRIORITY = 2,
   QUEUE_UNDEFINED = 3
 };
-
 
 enum status {
   STATUS_READY = 1,
@@ -55,14 +52,11 @@ typedef struct UThreadOptions UThreadOptions;
 typedef struct ThreadBlock ThreadBlock;
 
 struct UThreadContext {
+
   UThreadOptions uThreadOptions;
-
   ThreadBlock * waitingQueueHead;
-
   ThreadBlock ** queueHeads;
-
   int currentRunningQueue;
-
   ucontext_t * mainContext;
   int currentID;
   int isInitialized;
