@@ -18,7 +18,7 @@ $ clib install parthdesai/uthread
 
 # License
 
-  MIT
+  Apache 2.0
 
 # Contributors:
 
