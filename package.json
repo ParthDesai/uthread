@@ -5,7 +5,7 @@
   "description": "A pre-emptive and priority driven threading library for linux",
   "keywords": ["thread", "find", "path", "bin", "executable"],
   "license": "MIT",
-  "src": ["src/uthread.c", "src/uthread.h"],
+  "src": ["src/uthread.c"],
   "dependencies": {
     "strdup": "0.0.0"
   }
