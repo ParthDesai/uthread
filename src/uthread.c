@@ -40,7 +40,11 @@ static ThreadBlock * GetNextReadyThreadFromQueue(int queue);
 static ThreadBlock * GetCurrentlyRunningThread(int * queue);
 
 
-
+/**
+* Gets currently running thread. And also points @queue to current running
+* queue's index.
+* If current thread is not running in any queue returns NULL.
+**/
 static ThreadBlock * GetCurrentlyRunningThread(int * queue) {
   if(queue != NULL) {
     *queue = uThreadContext->currentRunningQueue;
@@ -52,7 +56,9 @@ static ThreadBlock * GetCurrentlyRunningThread(int * queue) {
   return uThreadContext->queueHeads[uThreadContext->currentRunningQueue];
 }
 
-
+/**
+* Gets next ready to run thread from queue at the index @queue parameter.
+**/
 static ThreadBlock * GetNextReadyThreadFromQueue(int queue) {
   if(uThreadContext->currentRunningQueue == QUEUE_UNDEFINED) {
     return uThreadContext->queueHeads[queue];
@@ -65,7 +71,10 @@ static ThreadBlock * GetNextReadyThreadFromQueue(int queue) {
   }
 }
 
-
+/**
+* Gets next ready to run thread, and points @queue to the index of the queue.
+* If all the queues does not contain anything, It will return NULL.
+**/
 static ThreadBlock * GetNextReadyThread(int * queue) {
   *queue = QUEUE_UNDEFINED;
 
@@ -83,10 +92,20 @@ static ThreadBlock * GetNextReadyThread(int * queue) {
   }
 }
 
+/**
+* This function initializes main context.
+* It is called as part of initiation process.
+**/
 static void InitializeMainContext() {
   uThreadContext->mainContext = (ucontext_t *) malloc(sizeof(ucontext_t));
 }
 
+/**
+* This function re-schedules thread. Here, @removeRunningThread
+* is specified, it will remove running thread from list (i.e terminating it.)
+* If there is no thread in any queue, as a result of terminating the thread, it will
+* switch to main context.
+**/
 static void ReScheduleThreads(int removeRunningThread) {
 
   int queue;
@@ -106,11 +125,13 @@ static void ReScheduleThreads(int removeRunningThread) {
     return;
   }
 
-
+   // Don't need to do anything, if this is the only thread running.
   if(threadBlock == currentRunningThread) {
     return;
   }
 
+   // This case occurs, when there is no thread in any queues,
+   // And main thread has scheduled first thread.
   if(uThreadContext->currentRunningQueue == QUEUE_UNDEFINED) {
     uThreadContext->currentRunningQueue = queue;
     uThreadContext->queueHeads[queue] = threadBlock;
@@ -130,7 +151,10 @@ static void ReScheduleThreads(int removeRunningThread) {
   }
 }
 
-
+/**
+* This function adds thread block referenced by @block to head of the list  @listHead
+* If that list is emply (NULL), then this function will also initialize the list.
+**/
 static ThreadBlock * AddThreadBlockToList(ThreadBlock * listHead,ThreadBlock * block) {
   if(listHead == NULL) {
     listHead = block;
@@ -146,7 +170,10 @@ static ThreadBlock * AddThreadBlockToList(ThreadBlock * listHead,ThreadBlock * b
   }
 }
 
-
+/**
+* Finds thread block with @id, in the list @listHead.
+* Returns NULL, if queue is empty, or block not found.
+**/
 static ThreadBlock * FindThreadBlockFromList(ThreadBlock * listHead,int id) {
   ThreadBlock * pointer = listHead;
   ThreadBlock * result = NULL;
@@ -166,11 +193,17 @@ static ThreadBlock * FindThreadBlockFromList(ThreadBlock * listHead,int id) {
   return result;
 }
 
+/**
+* Removes thread block with @id, from list referenced by @listHead.
+**/
 static ThreadBlock * RemoveThreadBlockFromListUsingID(ThreadBlock ** listHead,int id) {
   ThreadBlock * threadBlock = FindThreadBlockFromList(*listHead,id);
   return RemoveThreadBlockFromList(listHead,threadBlock);
 }
 
+/**
+* Removes @threadBlock from the list referenced by @listHead.
+**/
 static ThreadBlock * RemoveThreadBlockFromList(ThreadBlock ** listHead,ThreadBlock * threadBlock) {
   if(threadBlock == NULL) {
     return NULL;
@@ -229,6 +262,10 @@ static void InitializeVirtualTimer() {
   UnblockSignal(TIMER_SIGNAL_NO);
 }
 
+/**
+* Prepares to catch virtual timer signal, for pre-emption of
+* thread.
+**/
 static void InitializeSignalHandler() {
   struct sigaction t;
   t.sa_flags = SA_ONSTACK | SA_SIGINFO;
@@ -237,6 +274,10 @@ static void InitializeSignalHandler() {
   sigaction(TIMER_SIGNAL_NO,&t,NULL);
 }
 
+/**
+* Registers a relation between parent and child thread block. To notify
+* parent when child is terminated.
+**/
 static void RegisterThreadBlockRelation(ThreadBlock * threadBlock) {
   if(uThreadContext->currentRunningQueue == QUEUE_UNDEFINED) {
     return;
@@ -245,7 +286,10 @@ static void RegisterThreadBlockRelation(ThreadBlock * threadBlock) {
   threadBlock->parent = uThreadContext->queueHeads[uThreadContext->currentRunningQueue];
 }
 
-
+/**
+* This function must be called by User of this library, before they can do anything.
+* It initializes Main thread context, and virtula timer for pre-emptive behaviour.
+**/
 int UThreadInit(UThreadOptions uThreadOptions) {
   if(uThreadContext != NULL) {
     free(uThreadContext);
@@ -255,6 +299,10 @@ int UThreadInit(UThreadOptions uThreadOptions) {
   return 1;
 }
 
+/**
+* Exposed function, that enables user to schedule new thread. You can also \
+* specify priority via @pr parameter.
+**/
 int UThreadSchedThread(void (*func)(void *),void * argument,int pr,unsigned int stacksize) {
   if(uThreadContext->isInitialized == 0) {
     return -1;
@@ -288,11 +336,17 @@ int UThreadSchedThread(void (*func)(void *),void * argument,int pr,unsigned int 
   return threadBlock->id;
   }
 
-
+/**
+* Exposed function, that enables user to exit the running thread.
+**/
 void UThreadExitThread() {
   ExitRunningThread();
 }
 
+/**
+* Initialize UThread structure, which holds pointer to queue head, as well as option
+* and some simple stats.
+**/
 static void InitializeUThreadContext(UThreadOptions options) {
   uThreadContext = (UThreadContext *) malloc(sizeof(UThreadContext));
 
@@ -309,7 +363,10 @@ static void InitializeUThreadContext(UThreadOptions options) {
 }
 
 
-
+/**
+* Creates ucontext_t structure, and fills various parameters like stack size,
+* and linkedContext. And uses makeContext to create context from function pointer and argument.
+**/
 static ucontext_t * CreateContext(void (*func)(void),ucontext_t * linkedContext,long stackSize,int isArgument,void * argument) {
 
   ucontext_t * context = (ucontext_t *) malloc(sizeof(ucontext_t));
@@ -328,11 +385,20 @@ static ucontext_t * CreateContext(void (*func)(void),ucontext_t * linkedContext,
   return context;
 }
 
+/**
+* Exits running thread.
+* Blocks timer signal, to prevent context switch, while we
+* are removing this thread.
+**/
 static void ExitRunningThread() {
   BlockSignal(TIMER_SIGNAL_NO);
   ReScheduleThreads(1);
 }
 
+/**
+* Creates a ThreadBlock structure from @func, and its @argument.
+* @stacksize is passed to CreateContext call.
+**/
 static ThreadBlock * CreateThread(void (*func) (void *),void * argument,long stackSize) {
 
   ucontext_t * linkedContext = CreateContext(ExitRunningThread,NULL,stackSize,0,NULL);
