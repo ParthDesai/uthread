@@ -4,10 +4,10 @@ A pre-emptive and priority driven threading library for linux.
 
 ## Installation
 
-  Install with [clib](https://github.com/clibs/clib):
+  Install with makefile
 
 ```
-$ clib install parthdesai/uthread
+$ make install
 ```
 
 ## API
